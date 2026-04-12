@@ -1,0 +1,119 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+.screen { min-height: 100vh; width: 100vw; background: #000; overflow: hidden; }
+
+/* ─── Idle / black ───────────────────────────────── */
+.idle-screen { background: #000; }
+
+/* ─── QR only ────────────────────────────────────── */
+.qr-screen {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qr-center { display: flex; align-items: center; justify-content: center; }
+
+/* ─── Assigned slot ──────────────────────────────── */
+.assigned-screen {
+  background: #0a1628;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.assigned-center { text-align: center; color: #fff; }
+.assigned-slot {
+  font-size: clamp(6rem, 20vw, 14rem);
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, #2f80ed, #23c8b2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.assigned-subtitle { margin-top: 16px; font-size: 1.4rem; color: #8fb1ff; }
+
+/* ─── Full / error message ───────────────────────── */
+.center-msg {
+  background: #0a1628;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  min-height: 100vh;
+}
+.center-msg h1 { font-size: clamp(2.5rem, 8vw, 5rem); color: #ff6a6a; }
+.center-msg p { margin-top: 12px; font-size: 1.2rem; color: #b9c8e3; }
+
+/* ─── Admin panel ────────────────────────────────── */
+.admin-screen {
+  background: #0f1724;
+  min-height: 100vh;
+  padding: 24px;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-y: auto;
+}
+.admin-container { max-width: 800px; margin: 0 auto; }
+.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.admin-header h2 { margin: 0; font-size: 1.6rem; }
+.admin-close {
+  background: rgba(255,255,255,0.1); border: none; color: #fff;
+  padding: 10px 20px; border-radius: 8px; cursor: pointer;
+  font-size: 1rem; font-weight: 600;
+}
+.admin-close:hover { background: rgba(255,255,255,0.2); }
+.admin-status { display: flex; gap: 16px; margin-bottom: 24px; }
+.admin-dot {
+  padding: 8px 14px; border-radius: 999px;
+  background: rgba(115,142,255,0.16); color: #d7e2ff;
+  font-weight: 600; font-size: 0.9rem;
+}
+.admin-settings, .admin-slots {
+  background: rgba(255,255,255,0.05);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.admin-settings h3, .admin-slots h3 {
+  margin: 0 0 16px; font-size: 1.1rem; color: #8fb1ff;
+}
+.setting-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-row label { color: #b9c8e3; font-size: 0.95rem; }
+.setting-view {
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+  padding: 6px 12px; border-radius: 8px; background: rgba(255,255,255,0.05);
+}
+.setting-view:hover { background: rgba(255,255,255,0.1); }
+.setting-view span { font-weight: 700; font-size: 1.1rem; color: #23c8b2; }
+.edit-btn { background: none; border: none; color: #8fb1ff; cursor: pointer; font-size: 1rem; padding: 4px; }
+.setting-edit { display: flex; gap: 8px; align-items: center; }
+.setting-edit input {
+  width: 80px; padding: 8px 12px; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08);
+  color: #fff; font-size: 1rem; text-align: center;
+}
+.setting-edit button {
+  width: 36px; height: 36px; border-radius: 8px; border: none;
+  cursor: pointer; font-size: 1.1rem; font-weight: 700;
+}
+.setting-edit button:first-of-type { background: #2f80ed; color: #fff; }
+.setting-edit button:last-of-type { background: rgba(255,255,255,0.1); color: #fff; }
+.admin-slots-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.admin-slot { padding: 16px 10px; border-radius: 12px; text-align: center; }
+.admin-slot strong { display: block; font-size: 1.4rem; margin-bottom: 4px; }
+.admin-slot span { font-size: 0.8rem; }
+.admin-slot.free { background: rgba(42,208,135,0.14); color: #96f0be; }
+.admin-slot.occupied { background: rgba(255,106,106,0.12); color: #ffb2b2; }
+
+@media (max-width: 600px) {
+  .admin-slots-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .assigned-slot { font-size: 6rem; }
+  .qr-center svg { width: 280px !important; height: 280px !important; }
+}

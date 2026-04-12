@@ -1,0 +1,47 @@
+{
+  "name": "smart-parking-monorepo",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ],
+    "catalog": {
+      "dotenv": "^17.2.2",
+      "zod": "^4.1.13",
+      "lucide-react": "^0.546.0",
+      "next-themes": "^0.4.6",
+      "sonner": "^2.0.5",
+      "convex": "^1.33.1",
+      "@types/react-dom": "^19.2.3",
+      "tailwindcss": "^4.1.18"
+    }
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "check-types": "turbo check-types",
+    "dev:web": "turbo -F @smart-parking/web dev",
+    "dev:native": "turbo -F @smart-parking/native dev",
+    "dev:convex": "turbo -F @smart-parking/convex dev",
+    "dev:convex:setup": "turbo -F @smart-parking/convex dev:setup",
+    "deploy:convex": "turbo -F @smart-parking/convex deploy",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
+  },
+  "dependencies": {
+    "dotenv": "catalog:",
+    "zod": "catalog:",
+    "expo": "~54.0.33",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
+  },
+  "devDependencies": {
+    "turbo": "^2.8.12",
+    "typescript": "^5"
+  },
+  "packageManager": "bun@1.3.8",
+  "version": "1.0.0"
+}
