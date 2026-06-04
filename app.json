@@ -1,5 +1,10 @@
 {
   "android": {
     "package": "com.anonymous.smartparkingmonorepo"
+  },
+  "extra": {
+    "eas": {
+      "projectId": "3a50e3aa-b10b-4085-8f89-344bcc3778d1"
+    }
   }
 }

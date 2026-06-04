@@ -1,15 +1,17 @@
 # Smart Parking Monorepo
 
-This is a monorepo for the Smart Parking system, managed with Turborepo. It contains a Convex backend, web application, and native mobile application.
+This is a monorepo for the Smart Parking system, managed with Turborepo. It contains only three apps: a fullstack Next.js app, a Raspberry Pi device agent, and a native mobile app.
 
 ## Features
 
 - **TypeScript** - For type safety and improved developer experience
 - **React Native** - Build mobile apps using React
 - **Expo** - Tools for React Native development
-- **TailwindCSS** - Utility-first CSS for rapid UI developments
-- **Shared UI package** - shadcn/ui primitives live in `packages/ui`
-- **Convex** - Reactive backend-as-a-service platform
+- **Next.js** - Fullstack frontend and backend in one app
+- **daisyUI** - Dark dashboard and display UI components
+- **Turso** - LibSQL database for parking state and sessions
+- **Drizzle ORM** - Thin SQL layer over the Turso database
+- **Ably** - Realtime updates for the display and mobile app
 - **Turborepo** - Optimized monorepo build system
 
 ## Getting Started
@@ -17,80 +19,62 @@ This is a monorepo for the Smart Parking system, managed with Turborepo. It cont
 First, install the dependencies:
 
 ```bash
-bun install
+pnpm install
 ```
 
-## Convex Setup
+## Setup
 
-This project uses Convex as a backend. You'll need to set up Convex before running the app:
+The fullstack app is the main backend and frontend. It stores state in Turso and uses Ably for realtime updates.
+
+Copy `apps/fullstack/.env.example` to `apps/fullstack/.env.local` and set:
 
 ```bash
-bun run dev:convex:setup
+TURSO_DATABASE_URL
+TURSO_AUTH_TOKEN
+ABLY_API_KEY
+DEVICE_API_KEY
+DISPLAY_QR_VALUE
 ```
 
-Follow the prompts to create a new Convex project and connect it to your application.
+For the Pi device agent, copy `apps/pi/.env.example` to `apps/pi/.env` and set:
 
-Copy environment variables from `apps/convex/.env.local` to `apps/*/.env`.
+```bash
+CLOUD_API_URL
+DEVICE_API_KEY
+SERIAL_PORT
+SERIAL_BAUD_RATE
+```
+
+The native app asks for the fullstack app URL on first launch.
 
 Then, run the development server:
 
 ```bash
-bun run dev
+pnpm dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser to see the web application.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the fullstack app.
 Use the Expo Go app to run the mobile application.
-Your app will connect to the Convex cloud backend automatically.
-
-## UI Customization
-
-React web apps in this stack share shadcn/ui primitives through `packages/ui`.
-
-- Change design tokens and global styles in `packages/ui/src/styles/globals.css`
-- Update shared primitives in `packages/ui/src/components/*`
-- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/web/components.json`
-
-### Add more shared components
-
-Run this from the project root to add more primitives to the shared UI package:
-
-```bash
-npx shadcn@latest add accordion dialog popover sheet table -c packages/ui
-```
-
-Import shared components like this:
-
-```tsx
-import { Button } from "@smart-parking/ui/components/button";
-```
-
-### Add app-specific blocks
-
-If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/web`.
 
 ## Project Structure
 
 ```
 smart-parking-monorepo/
 ├── apps/
-│   ├── web/         # Web application (React + Vite)
+│   ├── fullstack/   # Next.js app with dashboard, scan page, API routes, Turso, and Ably
 │   ├── native/      # Mobile application (React Native, Expo)
-│   └── convex/      # Convex backend functions and schema
+│   └── pi/          # Raspberry Pi device agent for serial I/O and command polling
 ├── packages/
-│   ├── ui/          # Shared shadcn/ui components and styles
-│   ├── convex/      # Shared Convex utilities
 │   ├── env/         # Environment configuration
 │   └── config/      # Shared package configuration
 ```
 
 ## Available Scripts
 
-- `bun run dev`: Start all applications in development mode
-- `bun run build`: Build all applications
-- `bun run lint`: Lint all applications
-- `bun run dev:web`: Start only the web application
-- `bun run dev:native`: Start the React Native/Expo development server
-- `bun run dev:convex`: Start the Convex backend
-- `bun run dev:convex:setup`: Setup and configure your Convex project
-- `bun run deploy:convex`: Deploy the Convex backend
-- `bun run check-types`: Check TypeScript types across all apps
+- `pnpm dev`: Start all workspace apps in development mode
+- `pnpm build`: Build the workspace
+- `pnpm lint`: Lint the workspace
+- `pnpm dev:fullstack`: Start only the Next.js fullstack app
+- `pnpm dev:pi`: Start only the Raspberry Pi device agent
+- `pnpm dev:native`: Start only the React Native/Expo development server
+- `pnpm check-types`: Check TypeScript types across the workspace

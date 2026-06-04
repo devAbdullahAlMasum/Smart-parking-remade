@@ -12,18 +12,15 @@ Servo gate;
 #define ir_car4 8
 #define ir_car5 9
 
-const unsigned long debounceDelay = 800;
 const unsigned long gateDelay = 5000;
-const unsigned long slotPublishInterval = 500;
 const int gateClosedAngle = 10;
 const int gateOpenOffset = 90;
 
 bool gateOpen = false;
 unsigned long gateTimer = 0;
-unsigned long lastEntryTrigger = 0;
-unsigned long lastExitTrigger = 0;
-unsigned long lastSlotPublish = 0;
 
+int lastEntryState = -1;
+int lastExitState = -1;
 int lastSlots[5] = { -1, -1, -1, -1, -1 };
 
 void setup() {
@@ -67,16 +64,20 @@ void handleSerialCommand() {
 }
 
 void handleEntrySensor() {
-  if (digitalRead(ir_enter) == LOW && millis() - lastEntryTrigger > debounceDelay) {
-    Serial.println("EVENT:ENTRY_SENSOR");
-    lastEntryTrigger = millis();
+  int currentState = digitalRead(ir_enter) == LOW ? 1 : 0;
+  if (currentState != lastEntryState) {
+    Serial.print("ENTRY_SENSOR:");
+    Serial.println(currentState);
+    lastEntryState = currentState;
   }
 }
 
 void handleExitSensor() {
-  if (digitalRead(ir_exit) == LOW && millis() - lastExitTrigger > debounceDelay) {
-    Serial.println("EVENT:EXIT_SENSOR");
-    lastExitTrigger = millis();
+  int currentState = digitalRead(ir_exit) == LOW ? 1 : 0;
+  if (currentState != lastExitState) {
+    Serial.print("EXIT_SENSOR:");
+    Serial.println(currentState);
+    lastExitState = currentState;
   }
 }
 
@@ -92,7 +93,7 @@ void publishSlotsIfChanged() {
     }
   }
 
-  if (!changed && millis() - lastSlotPublish < slotPublishInterval) {
+  if (!changed) {
     return;
   }
 
@@ -104,8 +105,6 @@ void publishSlotsIfChanged() {
     }
   }
   Serial.println();
-
-  lastSlotPublish = millis();
 }
 
 void readSlots(int slots[5]) {
