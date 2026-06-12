@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { requestJson } from "#/lib/api"
+import { createWebAuthClient } from "#/lib/auth"
 import { storage } from "#/lib/storage"
-import type { User } from "#/lib/types"
 import { Toast, Field, PrimaryButton } from "#/components/ui"
 import { ScanLine } from "lucide-react"
 
@@ -12,43 +12,67 @@ export const Route = createFileRoute("/scanner")({
 	component: ScannerScreen,
 })
 
+type ToastType = "info" | "success" | "error"
+
 function ScannerScreen() {
 	const navigate = useNavigate()
 	const [scanning, setScanning] = useState(false)
+	const [webCameraActive, setWebCameraActive] = useState(false)
+	const [apiUrl, setApiUrl] = useState("")
 	const [processing, setProcessing] = useState(false)
-	const [toast, setToast] = useState({ message: "", type: "info" as const, visible: false })
+	const [toast, setToast] = useState<{ message: string; type: ToastType; visible: boolean }>({
+		message: "",
+		type: "info",
+		visible: false,
+	})
 	const [webFallback, setWebFallback] = useState(false)
+	const [cameraError, setCameraError] = useState("")
+	const videoRef = useRef<HTMLVideoElement | null>(null)
+	const streamRef = useRef<MediaStream | null>(null)
+	const scanFrameRef = useRef<number | null>(null)
+	const stoppedRef = useRef(false)
+	const authClient = useMemo(
+		() => (apiUrl ? createWebAuthClient(apiUrl) : null),
+		[apiUrl],
+	)
 
-	function showToast(message: string, type: "info" | "success" | "error" = "info") {
+	function showToast(message: string, type: ToastType = "info") {
 		setToast({ message, type, visible: true })
 		setTimeout(() => setToast((t) => ({ ...t, visible: false })), 3500)
 	}
 
 	async function handleScanResult(result: ScanResult) {
 		if (processing) return
+		stopWebCamera()
 		setProcessing(true)
 
 		try {
-			const apiUrl = await storage.getApiUrl()
-			const user = await storage.getUser<User>()
+			const url = apiUrl || await storage.getApiUrl()
 
-			if (!apiUrl || !user) {
+			if (!url) {
 				navigate({ to: "/setup" })
 				return
 			}
 
+			const client = authClient ?? createWebAuthClient(url)
+			const session = await client.getSession()
+			if (session.error || !session.data?.user) {
+				navigate({ to: "/auth" })
+				return
+			}
+
 			const data = await requestJson<{ assignedSlotCode: string }>(
-				`${apiUrl}/api/check-in`,
+				`${url}/api/me/check-in`,
 				{
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
-						userId: user.id,
 						locationCode: result.ScanResult,
 					}),
 				},
 			)
 
+			await storage.removeBooking()
 			showToast(`Assigned to spot ${data.assignedSlotCode}`, "success")
 			setTimeout(() => navigate({ to: "/dashboard" }), 1500)
 		} catch (err) {
@@ -60,8 +84,100 @@ function ScannerScreen() {
 		}
 	}
 
+	function stopWebCamera() {
+		stoppedRef.current = true
+		if (scanFrameRef.current !== null) {
+			cancelAnimationFrame(scanFrameRef.current)
+			scanFrameRef.current = null
+		}
+		streamRef.current?.getTracks().forEach((track) => track.stop())
+		streamRef.current = null
+		setWebCameraActive(false)
+		setScanning(false)
+	}
+
+	async function startWebScan() {
+		setCameraError("")
+		setWebFallback(false)
+		setScanning(true)
+		setWebCameraActive(true)
+		stoppedRef.current = false
+
+		const BarcodeDetectorCtor = (window as unknown as {
+			BarcodeDetector?: new (options?: { formats?: string[] }) => {
+				detect: (source: HTMLVideoElement) => Promise<Array<{ rawValue?: string }>>
+			}
+		}).BarcodeDetector
+
+		if (!BarcodeDetectorCtor) {
+			setCameraError("This browser does not support QR detection. Use Chrome on Android or enter the parking code manually.")
+			setWebFallback(true)
+			setWebCameraActive(false)
+			setScanning(false)
+			return
+		}
+
+		if (!navigator.mediaDevices?.getUserMedia) {
+			setCameraError("Camera access is not available in this browser. Enter the parking code manually.")
+			setWebFallback(true)
+			setWebCameraActive(false)
+			setScanning(false)
+			return
+		}
+
+		try {
+			const stream = await navigator.mediaDevices.getUserMedia({
+				video: { facingMode: { ideal: "environment" } },
+				audio: false,
+			})
+			streamRef.current = stream
+			await new Promise((resolve) => requestAnimationFrame(resolve))
+
+			const video = videoRef.current
+			if (!video) {
+				throw new Error("Scanner video is not ready.")
+			}
+
+			video.srcObject = stream
+			await video.play()
+
+			const detector = new BarcodeDetectorCtor({ formats: ["qr_code"] })
+			const scan = async () => {
+				if (stoppedRef.current || processing) return
+
+				try {
+					const codes = await detector.detect(video)
+					const value = codes.find((code) => code.rawValue)?.rawValue
+					if (value) {
+						await handleScanResult({ ScanResult: value, format: 17 })
+						return
+					}
+				} catch {
+					// Keep scanning. Some frames fail while the camera is focusing.
+				}
+
+				scanFrameRef.current = requestAnimationFrame(scan)
+			}
+
+			scanFrameRef.current = requestAnimationFrame(scan)
+		} catch (err) {
+			stopWebCamera()
+			const message = err instanceof Error ? err.message : "Camera permission denied."
+			setCameraError(
+				`${message} If you opened this over http://192.168.x.x, Chrome may block camera access unless the page is HTTPS.`,
+			)
+			setWebFallback(true)
+		}
+	}
+
 	async function startScan() {
 		try {
+			const core = await import("@capacitor/core")
+			if (!core.Capacitor.isNativePlatform()) {
+				await startWebScan()
+				return
+			}
+
 			const mod = await import("@capacitor/barcode-scanner")
 			const { CapacitorBarcodeScanner, CapacitorBarcodeScannerTypeHintALLOption } = mod
 
@@ -78,15 +194,68 @@ function ScannerScreen() {
 			} else {
 				navigate({ to: "/dashboard" })
 			}
-		} catch {
+		} catch (err) {
+			setCameraError(err instanceof Error ? err.message : "Camera scanner failed.")
 			setWebFallback(true)
 			setScanning(false)
 		}
 	}
 
 	useEffect(() => {
-		startScan()
+		storage.getApiUrl().then((url) => {
+			if (!url) {
+				navigate({ to: "/setup" })
+				return
+			}
+			setApiUrl(url)
+			startScan()
+		})
+
+		return () => stopWebCamera()
 	}, [])
+
+	if (webCameraActive) {
+		return (
+			<div className="min-h-dvh bg-base-100 flex flex-col">
+				<Toast {...toast} />
+
+				<div
+					className="flex items-center justify-between px-5"
+					style={{ paddingTop: "calc(1.5rem + var(--safe-top))" }}
+				>
+					<h1 className="text-xl font-semibold text-white">Scan QR code</h1>
+					<button
+						type="button"
+						onClick={() => {
+							stopWebCamera()
+							navigate({ to: "/dashboard" })
+						}}
+						className="text-[13px] font-medium text-base-content/40 hover:text-white transition-colors"
+					>
+						Close
+					</button>
+				</div>
+
+				<div className="flex-1 flex flex-col items-center justify-center px-5 space-y-5">
+					<div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-base-content/10 bg-black aspect-[3/4]">
+						<video
+							ref={videoRef}
+							className="h-full w-full object-cover"
+							playsInline
+							muted
+						/>
+						<div className="absolute inset-8 rounded-2xl border-2 border-white/80 shadow-[0_0_0_999px_rgba(0,0,0,0.35)]" />
+					</div>
+					<p className="max-w-sm text-center text-[13px] text-base-content/50">
+						Point the camera at the Parking in dinajpur QR code.
+					</p>
+					<PrimaryButton onClick={() => { stopWebCamera(); setWebFallback(true) }}>
+						Enter code manually
+					</PrimaryButton>
+				</div>
+			</div>
+		)
+	}
 
 	if (scanning && !webFallback) {
 		return (
@@ -128,7 +297,7 @@ function ScannerScreen() {
 					<div className="text-center space-y-6 w-full max-w-sm">
 						<div className="space-y-2">
 							<p className="text-[15px] font-medium text-base-content/50">
-								Camera scanning is available in the installed app.
+								{cameraError || "Camera scanning is not available here."}
 							</p>
 							<p className="text-[13px] text-base-content/30">
 								Enter the location code from the entrance sign instead.

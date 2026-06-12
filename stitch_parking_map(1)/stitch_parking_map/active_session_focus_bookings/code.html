@@ -1,0 +1,234 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>EmptySpot - Bookings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#fff4dc",
+                    "divider": "#757575",
+                    "on-secondary-fixed-variant": "#564500",
+                    "surface-tint": "#ebc313",
+                    "status-warning": "#FFB800",
+                    "on-error": "#690005",
+                    "surface-container-low": "#1f1b11",
+                    "text-muted": "#A3A3A3",
+                    "error": "#ffb4ab",
+                    "surface-bright": "#3d392d",
+                    "on-error-container": "#ffdad6",
+                    "on-background": "#eae2d1",
+                    "outline": "#999079",
+                    "tertiary-fixed": "#81f4ff",
+                    "surface-variant": "#393429",
+                    "primary-fixed-dim": "#ebc313",
+                    "primary-fixed": "#ffe17b",
+                    "secondary-fixed": "#ffe081",
+                    "text-primary": "#FFFFFF",
+                    "text-secondary": "#D1D1D1",
+                    "on-tertiary": "#00363b",
+                    "secondary-container": "#caa500",
+                    "inverse-on-surface": "#343025",
+                    "surface": "#161309",
+                    "surface-card": "#555555",
+                    "tertiary-container": "#06efff",
+                    "tertiary-fixed-dim": "#00dbea",
+                    "tertiary": "#d9fbff",
+                    "on-surface": "#eae2d1",
+                    "surface-container-highest": "#393429",
+                    "on-primary-fixed-variant": "#564500",
+                    "on-primary-fixed": "#231b00",
+                    "on-primary": "#3b2f00",
+                    "on-tertiary-container": "#006970",
+                    "border-low": "#6A6A6A",
+                    "inverse-primary": "#715c00",
+                    "surface-elevated": "#606060",
+                    "secondary-fixed-dim": "#ebc32d",
+                    "surface-primary": "#434343",
+                    "secondary": "#ebc32d",
+                    "on-primary-container": "#715c00",
+                    "background": "#161309",
+                    "surface-container": "#231f15",
+                    "primary-container": "#ffd52d",
+                    "surface-container-lowest": "#110e05",
+                    "status-maintenance": "#8A8A8A",
+                    "surface-secondary": "#4D4D4D",
+                    "on-tertiary-fixed": "#002022",
+                    "on-surface-variant": "#d0c6ac",
+                    "on-secondary-fixed": "#231b00",
+                    "surface-container-high": "#2e2a1f",
+                    "on-tertiary-fixed-variant": "#004f55",
+                    "on-secondary-container": "#4b3c00",
+                    "on-secondary": "#3c2f00",
+                    "surface-dim": "#161309",
+                    "inverse-surface": "#eae2d1",
+                    "error-container": "#93000a",
+                    "outline-variant": "#4d4633",
+                    "status-occupied": "#FF6B57"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "margin-desktop": "32px",
+                    "touch-target": "48px",
+                    "margin-mobile": "16px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Inter"],
+                    "section-heading": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "card-title": ["Inter"],
+                    "body-reg": ["Inter"],
+                    "stat-display": ["JetBrains Mono"],
+                    "caption": ["Inter"],
+                    "label-mono": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                    "section-heading": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                    "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "card-title": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+                    "body-reg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                    "stat-display": ["24px", { "lineHeight": "32px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                    "caption": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                    "label-mono": ["11px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "500" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row font-body-reg text-body-reg selection:bg-primary-container selection:text-on-primary-container overflow-x-hidden">
+<!-- DESKTOP SIDE NAV -->
+<nav class="hidden md:flex flex-col w-64 bg-surface-container border-r border-outline-variant z-50 h-screen sticky top-0 shrink-0">
+<div class="p-margin-desktop">
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary">EMPTYSPOT</h1>
+</div>
+<div class="flex flex-col gap-2 px-4 mt-8 flex-1">
+<a class="flex items-center gap-4 text-on-surface-variant p-3 rounded-lg hover:bg-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-card-title text-card-title">Home</span>
+</a>
+<!-- ACTIVE TAB -->
+<a class="flex items-center gap-4 bg-secondary-container text-on-secondary-container p-3 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="event_available" style="font-variation-settings: 'FILL' 1;">event_available</span>
+<span class="font-card-title text-card-title">Bookings</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant p-3 rounded-lg hover:bg-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-card-title text-card-title">Notifications</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant p-3 rounded-lg hover:bg-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-card-title text-card-title">Profile</span>
+</a>
+</div>
+</nav>
+<!-- MOBILE MAIN CONTENT WRAPPER -->
+<div class="flex-1 flex flex-col w-full relative md:pb-0">
+<!-- MAIN CANVAS -->
+<main class="flex-1 p-margin-mobile md:p-margin-desktop flex flex-col gap-8 max-w-4xl mx-auto w-full pt-8 md:pt-margin-desktop">
+<!-- ACTIVE BOOKINGS -->
+<section class="flex flex-col gap-4">
+<h3 class="font-section-heading text-section-heading text-on-surface flex items-center gap-2 uppercase tracking-widest text-[14px]">
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span> 
+                    Active Session
+                </h3>
+<article class="bg-surface-container-high rounded-xl overflow-hidden border border-outline-variant shadow-2xl">
+<div class="p-5 flex flex-col gap-5">
+<div class="flex items-start justify-between">
+<div class="flex flex-col gap-1">
+<p class="font-label-mono text-[10px] text-primary-container tracking-[0.2em] uppercase">Current Location</p>
+<h4 class="font-headline-lg-mobile text-text-primary">Terminal A VIP Garage</h4>
+<div class="flex items-center gap-1.5 text-text-muted mt-1">
+<span class="material-symbols-outlined text-[18px] text-primary-container">location_on</span>
+<span class="font-body-reg">Level 3, Bay 42</span>
+</div>
+</div>
+<div class="bg-primary-container/10 border border-primary-container/20 px-3 py-1 rounded">
+<span class="font-label-mono text-primary-container text-[11px] font-bold tracking-widest">ES-882X</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col">
+<p class="font-label-mono text-[10px] text-text-muted tracking-widest uppercase mb-1">Checked In</p>
+<div class="flex items-baseline gap-2">
+<span class="font-stat-display text-text-primary text-2xl">02:00 PM</span>
+<span class="font-caption text-text-muted">Today</span>
+</div>
+</div>
+<div class="flex flex-col border-l border-outline-variant pl-4">
+<p class="font-label-mono text-[10px] text-text-muted tracking-widest uppercase mb-1">Expected Exit</p>
+<div class="flex items-baseline gap-2">
+<span class="font-stat-display text-text-primary text-2xl">06:30 PM</span>
+<span class="font-caption text-text-muted">Today</span>
+</div>
+</div>
+</div><div class="grid grid-cols-1 gap-4 pt-4 border-t border-outline-variant"><div class="flex flex-col"><p class="font-label-mono text-[10px] text-text-muted tracking-widest uppercase mb-1">Vehicle</p><p class="font-body-reg text-text-primary">Model 3 - Silver (ABC-1234)</p></div><div class="grid grid-cols-2 gap-4"><div class="flex flex-col"><p class="font-label-mono text-[10px] text-text-muted tracking-widest uppercase mb-1">Rate</p><p class="font-stat-display text-text-primary text-[18px]">$4.50 / hour</p></div><div class="flex flex-col border-l border-outline-variant pl-4"><p class="font-label-mono text-[10px] text-primary-container tracking-widest uppercase mb-1">Current Total</p><p class="font-stat-display text-primary-container text-[18px]">$13.50</p></div></div></div>
+</div>
+<div class="bg-surface-container-highest/50 border-t border-outline-variant p-5 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 bg-primary-container p-1 rounded-lg flex items-center justify-center shrink-0 shadow-inner"><img alt="QR Code" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5Zv5yyz2tdbQoTUUfIDV1hI041vpAJZPnqOYX1a6gymNguIrpyTgPmEYuAWGdjQcLPIvVYWOyIqJPARc4fy3ubpjbgxybweX9APHVIYWXxNrljKLcrz-Tc28ddtoJnRiGCd9PWB0nyyuwGG_YJnT4SEqjhKp-Bh4MPps4tyxwcU6qbP3f7fRNOQydgUFRBTL5dfn91gusZwSf5SgVsGT-NcQ5foBA320NzzzQbZ2TpGBTOMDB6m4OkK-6ivKdYep-Mr6l0tBMCkCtzes"></div>
+<div class="flex flex-col">
+<p class="font-label-mono text-[11px] text-text-primary tracking-widest uppercase font-bold">Entry Pass Active</p>
+<p class="text-caption text-text-muted">Scan at terminal gate 4</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-text-muted">chevron_right</span>
+</div>
+</article>
+</section><div class="flex flex-row gap-3 w-full md:hidden"><button class="flex-1 flex items-center justify-center gap-2 bg-primary-container text-on-primary-container px-4 py-3 rounded font-card-title text-card-title hover:bg-surface-tint transition-all active:scale-95 shadow-lg"><span class="material-symbols-outlined text-[20px]">add_circle</span> New Booking</button><button class="flex-1 flex items-center justify-center gap-2 bg-surface-container-high text-on-surface px-4 py-3 rounded font-card-title text-card-title hover:bg-surface-variant transition-all active:scale-95 shadow-lg"><span class="material-symbols-outlined text-[20px]">history</span> Past History</button></div>
+<!-- UPCOMING BOOKINGS -->
+</main>
+</div>
+<!-- MOBILE BOTTOM NAV BAR -->
+<nav class="bg-surface-container text-secondary font-caption text-caption fixed bottom-0 w-full z-50 border-t border-outline-variant flex justify-around items-center px-2 py-2 md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="home">home</span>
+<span class="mt-1">Home</span>
+</a>
+<!-- ACTIVE -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-lg px-6 py-2 active:scale-95 transition-all shadow-lg" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="event_available" style="font-variation-settings: 'FILL' 1;">event_available</span>
+<span class="mt-1 font-semibold">Bookings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="notifications">notifications</span>
+<span class="mt-1">Alerts</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="person">person</span>
+<span class="mt-1">Profile</span>
+</a>
+</nav>
+
+
+
+
+
+
+</body></html>

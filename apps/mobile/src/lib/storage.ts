@@ -3,6 +3,7 @@ import { Preferences } from "@capacitor/preferences"
 const KEYS = {
 	apiUrl: "smartParking.apiUrl",
 	user: "smartParking.user",
+	booking: "smartParking.booking",
 } as const
 
 export const storage = {
@@ -36,5 +37,24 @@ export const storage = {
 
 	async removeUser(): Promise<void> {
 		await Preferences.remove({ key: KEYS.user })
+	},
+
+	async getBooking<T>(): Promise<T | null> {
+		const { value } = await Preferences.get({ key: KEYS.booking })
+		if (!value) return null
+		try {
+			return JSON.parse(value) as T
+		} catch {
+			await Preferences.remove({ key: KEYS.booking })
+			return null
+		}
+	},
+
+	async setBooking<T>(booking: T): Promise<void> {
+		await Preferences.set({ key: KEYS.booking, value: JSON.stringify(booking) })
+	},
+
+	async removeBooking(): Promise<void> {
+		await Preferences.remove({ key: KEYS.booking })
 	},
 }

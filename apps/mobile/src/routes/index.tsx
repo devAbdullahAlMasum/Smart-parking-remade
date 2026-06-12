@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
-import { storage } from "#/lib/storage"
 import { PageShell } from "#/components/ui"
 import { Loader2 } from "lucide-react"
 
@@ -14,20 +13,6 @@ function IndexRedirect() {
 
 	useEffect(() => {
 		(async () => {
-			const apiUrl = await storage.getApiUrl()
-
-			if (!apiUrl) {
-				navigate({ to: "/setup" })
-				return
-			}
-
-			const user = await storage.getUser()
-
-			if (!user) {
-				navigate({ to: "/auth" })
-				return
-			}
-
 			navigate({ to: "/dashboard" })
 			setChecking(false)
 		})()

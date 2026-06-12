@@ -26,7 +26,8 @@ body {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	font-family: "Inter", system-ui, -apple-system, sans-serif;
-	letter-spacing: -0.01em;
+	letter-spacing: 0;
+	background: #161309;
 }
 
 #app {
@@ -40,6 +41,19 @@ body {
 	--safe-bottom: env(safe-area-inset-bottom, 0px);
 	--safe-left: env(safe-area-inset-left, 0px);
 	--safe-right: env(safe-area-inset-right, 0px);
+	--surface: #161309;
+	--surface-container: #231f15;
+	--surface-container-high: #2e2a1f;
+	--surface-variant: #393429;
+	--outline: #4d4633;
+	--text-primary: #ffffff;
+	--text-secondary: #d1d1d1;
+	--text-muted: #a3a3a3;
+	--safety-yellow: #ffd52d;
+	--safety-yellow-dim: #ebc32d;
+	--occupied: #ff6b57;
+	--maintenance: #8a8a8a;
+	--warning: #ffb800;
 }
 
 input,
@@ -52,4 +66,30 @@ textarea {
 
 .font-mono {
 	font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+button {
+	touch-action: manipulation;
+}
+
+@keyframes toast-in {
+	from {
+		transform: translateY(-100%);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes toast-out {
+	from {
+		transform: translateY(0);
+		opacity: 1;
+	}
+	to {
+		transform: translateY(-100%);
+		opacity: 0;
+	}
 }

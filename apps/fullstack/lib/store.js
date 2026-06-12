@@ -1,8 +1,9 @@
 import { asc, desc, eq, ne } from "drizzle-orm";
-import { publishRefresh } from "./realtime.js";
+import { publishRefresh, publishVehicleMovementAlert } from "./realtime.js";
 import {
   displayState,
   hardwareCommands,
+  parkings,
   parkingSessions,
   parkingSlots,
   runtimeState,
@@ -23,6 +24,7 @@ function mapUser(row) {
   return row
     ? {
         id: row.id,
+        authUserId: row.authUserId,
         isDemo: Boolean(row.isDemo ?? row.is_demo),
         name: row.name,
         phone: row.phone,
@@ -45,6 +47,17 @@ function mapSession(row) {
         slotCode: row.slotCode,
         assignedAt: row.assignedAt,
         exitedAt: row.exitedAt,
+      }
+    : null;
+}
+
+function mapParking(row) {
+  return row
+    ? {
+        id: row.id,
+        name: row.name,
+        code: row.code,
+        updatedAt: row.updatedAt,
       }
     : null;
 }
@@ -117,6 +130,18 @@ export async function syncGateSensorState(services, sensor, isActive) {
   await setGateSensorState(services, sensor, isActive);
 
   if (!isActive) {
+    if (sensor === "entry") {
+      setTimeout(async () => {
+        try {
+          const currentDisplay = await getDisplayState(services);
+          if (currentDisplay && (currentDisplay.mode === "assigned" || currentDisplay.mode === "show_qr")) {
+            await resetDisplayToIdle(services, "entry_clear");
+          }
+        } catch (err) {
+          console.error("Failed to reset display to idle:", err.message);
+        }
+      }, 2000);
+    }
     return { ok: true, sensor, isActive };
   }
 
@@ -191,7 +216,7 @@ export async function resetDisplayToIdle(services, source = "display") {
     {
       mode: "idle",
       title: "Waiting for car",
-      subtitle: "Drive to the gate to start parking.",
+      subtitle: "Drive to Parking in dinajpur to start parking.",
       qrValue: null,
       assignedSlotCode: null,
       locationId: null,
@@ -211,6 +236,25 @@ export async function listSlots(services) {
     isOccupied: row.isOccupied,
     updatedAt: row.updatedAt,
   }));
+}
+
+export async function listParkings(services) {
+  const rows = await services.db.select().from(parkings).orderBy(asc(parkings.id));
+  return rows.map(mapParking);
+}
+
+export async function getPrimaryParking(services) {
+  const [row] = await services.db.select().from(parkings).where(eq(parkings.id, 1)).limit(1);
+  return mapParking(row);
+}
+
+export async function getRegisteredParkingByCode(services, parkingCode) {
+  if (!parkingCode) {
+    return null;
+  }
+
+  const [row] = await services.db.select().from(parkings).where(eq(parkings.code, parkingCode)).limit(1);
+  return mapParking(row);
 }
 
 export async function getAllSettings(services) {
@@ -253,6 +297,7 @@ export async function createDemoUser(services, input) {
     .insert(users)
     .values({
       isDemo: true,
+      authUserId: null,
       name: input.name,
       phone: input.phone,
       licenseNumber: input.licenseNumber,
@@ -273,6 +318,7 @@ export async function upsertUser(services, input) {
       .update(users)
       .set({
         isDemo: Boolean(input.isDemo),
+        authUserId: input.authUserId ?? null,
         name: input.name,
         phone: input.phone,
         licenseNumber: input.licenseNumber,
@@ -286,8 +332,9 @@ export async function upsertUser(services, input) {
 
   const [row] = await services.db
     .insert(users)
-      .values({
+    .values({
       isDemo: Boolean(input.isDemo),
+      authUserId: input.authUserId ?? null,
       name: input.name,
       phone: input.phone,
       licenseNumber: input.licenseNumber,
@@ -298,6 +345,30 @@ export async function upsertUser(services, input) {
     .returning();
 
   return mapUser(row);
+}
+
+export async function getUserByAuthUserId(services, authUserId) {
+  const [row] = await services.db.select().from(users).where(eq(users.authUserId, authUserId)).limit(1);
+  return mapUser(row);
+}
+
+export async function upsertAuthenticatedUser(services, authUser, input) {
+  const existing = await getUserByAuthUserId(services, authUser.id);
+  const payload = {
+    id: existing?.id,
+    authUserId: authUser.id,
+    isDemo: false,
+    name: input.name?.trim() || authUser.name || authUser.email,
+    phone: input.phone?.trim(),
+    licenseNumber: input.licenseNumber?.trim(),
+    vehicleNumber: input.vehicleNumber?.trim(),
+  };
+
+  if (!payload.name || !payload.phone || !payload.licenseNumber || !payload.vehicleNumber) {
+    throw new Error("Driver name, phone, license, and vehicle number are required");
+  }
+
+  return upsertUser(services, payload);
 }
 
 export async function getUserStatus(services, userId) {
@@ -350,6 +421,28 @@ export async function markSessionStatus(services, sessionId, status) {
   return mapSession(row);
 }
 
+export async function confirmUserDeparture(services, userId) {
+  const [session] = await services.db
+    .select()
+    .from(parkingSessions)
+    .where(eq(parkingSessions.userId, userId))
+    .orderBy(desc(parkingSessions.id))
+    .limit(1);
+
+  if (!session || !["parked", "departing"].includes(session.status)) {
+    throw new Error("No departure to confirm");
+  }
+
+  await services.db
+    .update(parkingSessions)
+    .set({ status: "exited", exitedAt: now(), emptySince: null, departingSince: null })
+    .where(eq(parkingSessions.id, session.id));
+
+  await enqueueClearAssignedSlot(services, "owner_confirmed_departure");
+  await refresh("session");
+  return { ok: true };
+}
+
 export async function activateLockdown(services) {
   await services.db.insert(securityLockdown).values({
     isLocked: true,
@@ -357,15 +450,17 @@ export async function activateLockdown(services) {
     resolvedAt: null,
   });
 
+  await enqueueCommand(services, "lockdown_on", "security_lockdown");
   await refresh("security");
   return { isLocked: true };
 }
 
-export async function enqueueOpenGate(services, source) {
+export async function enqueueCommand(services, commandType, source, payload = null) {
   const [row] = await services.db
     .insert(hardwareCommands)
     .values({
-      commandType: "open_gate",
+      commandType,
+      commandPayload: payload ? JSON.stringify(payload) : null,
       status: "pending",
       source,
       workerId: null,
@@ -377,6 +472,18 @@ export async function enqueueOpenGate(services, source) {
     .returning();
 
   return row ?? null;
+}
+
+export async function enqueueOpenGate(services, source) {
+  return enqueueCommand(services, "open_gate", source);
+}
+
+export async function enqueueAssignSlot(services, slotId, source) {
+  return enqueueCommand(services, "assign_slot", source, { slotId });
+}
+
+export async function enqueueClearAssignedSlot(services, source) {
+  return enqueueCommand(services, "clear_assigned_slot", source);
 }
 
 export async function claimNextPendingCommand(services, workerId) {
@@ -424,6 +531,7 @@ export async function requestUnlock(services) {
     resolvedAt: now(),
   });
 
+  await enqueueCommand(services, "lockdown_off", "mobile_unlock");
   await enqueueOpenGate(services, "mobile_unlock");
   await setSensorCooldown(services, 15);
   await refresh("security");
@@ -441,7 +549,9 @@ export async function requestCheckIn(services, userId, locationCode) {
     throw new Error("No active entry. Trigger entry sensor first.");
   }
 
-  if (locationCode && display.qrValue && String(locationCode).trim() !== String(display.qrValue).trim()) {
+  const parking = await getPrimaryParking(services);
+  const expectedCode = display.qrValue || parking?.code;
+  if (locationCode && expectedCode && String(locationCode).trim() !== String(expectedCode).trim()) {
     throw new Error("Invalid parking code");
   }
 
@@ -485,6 +595,7 @@ export async function requestCheckIn(services, userId, locationCode) {
   );
 
   await enqueueOpenGate(services, "mobile_check_in");
+  await enqueueAssignSlot(services, freeSlot.id, "mobile_check_in");
   await setSensorCooldown(services, 15);
 
   return {
@@ -512,8 +623,8 @@ export async function triggerEntrySensor(services) {
     {
       mode: "show_qr",
       title: "Scan this QR code",
-      subtitle: "Open the app and scan to get your parking slot.",
-      qrValue: process.env.DISPLAY_QR_VALUE || "LOCATION:1",
+      subtitle: "Open the app and scan to get your Parking in dinajpur slot.",
+      qrValue: process.env.PARKING_CODE || "DINJPUR-PARKING-1",
       assignedSlotCode: null,
       locationId: 1,
       qrExpiresAt,
@@ -556,6 +667,7 @@ async function reconcileSessions(services) {
           .update(parkingSessions)
           .set({ status: "parked", emptySince: null, departingSince: null })
           .where(eq(parkingSessions.id, session.id));
+        await enqueueClearAssignedSlot(services, "parked");
       }
       continue;
     }
@@ -575,17 +687,18 @@ async function reconcileSessions(services) {
         continue;
       }
 
-      const emptySince = session.emptySince || now();
-      if (!session.emptySince) {
-        await services.db.update(parkingSessions).set({ emptySince }).where(eq(parkingSessions.id, session.id));
-      }
-
-      if (Date.now() - toMillis(emptySince) >= departingConfirmMs) {
-        await services.db
-          .update(parkingSessions)
-          .set({ status: "departing", departingSince: now() })
-          .where(eq(parkingSessions.id, session.id));
-      }
+      const departedAt = now();
+      await services.db
+        .update(parkingSessions)
+        .set({ status: "departing", emptySince: departedAt, departingSince: departedAt })
+        .where(eq(parkingSessions.id, session.id));
+      await publishVehicleMovementAlert({
+        userId: session.userId,
+        sessionId: session.id,
+        slotCode: session.slotCode,
+        title: "Vehicle movement detected",
+        body: `Your car left ${session.slotCode}. Was this you?`,
+      });
       continue;
     }
 
@@ -611,6 +724,7 @@ async function reconcileSessions(services) {
           .update(parkingSessions)
           .set({ status: "exited", exitedAt: now(), emptySince: null, departingSince: null })
           .where(eq(parkingSessions.id, session.id));
+        await enqueueClearAssignedSlot(services, "session_exited");
       }
     }
   }
@@ -664,11 +778,12 @@ export async function updateAllSlots(services, slots) {
 }
 
 export async function getAdminState(services) {
-  const [display, slots, settings] = await Promise.all([
+  const [display, slots, parkings, settings] = await Promise.all([
     getDisplayState(services),
     listSlots(services),
+    listParkings(services),
     getAllSettings(services),
   ]);
 
-  return { display, slots, settings };
+  return { display, slots, parkings, settings };
 }

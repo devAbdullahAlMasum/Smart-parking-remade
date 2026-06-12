@@ -37,6 +37,20 @@ function AuthScreen() {
 		if (!authClient) return
 		setError("")
 
+		function reportAuthLog(message: string, extra: Record<string, unknown> = {}) {
+			void fetch(`${apiUrl}/api/client-log`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					level: "error",
+					message,
+					url: `${apiUrl}/api/auth/${mode === "sign-up" ? "sign-up/email" : "sign-in/email"}`,
+					method: "POST",
+					...extra,
+				}),
+			}).catch(() => undefined)
+		}
+
 		if (!email.trim() || !password) {
 			setError("Enter your email and password.")
 			return
@@ -62,11 +76,15 @@ function AuthScreen() {
 						})
 
 			if (result.error) {
+				reportAuthLog("Better Auth returned an error", { authError: result.error })
 				throw new Error(result.error.message ?? "Authentication failed.")
 			}
 
 			navigate({ to: "/profile" })
 		} catch (err) {
+			reportAuthLog("Better Auth request threw", {
+				error: err instanceof Error ? err.message : String(err),
+			})
 			setError(err instanceof Error ? err.message : "Authentication failed.")
 		} finally {
 			setSubmitting(false)

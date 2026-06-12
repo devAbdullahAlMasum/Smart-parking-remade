@@ -1,0 +1,228 @@
+<!DOCTYPE html><html class="dark" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Valet Pro Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#06efff",
+                    "status-maintenance": "#8A8A8A",
+                    "inverse-on-surface": "#343025",
+                    "secondary-fixed": "#ffe081",
+                    "outline": "#999079",
+                    "background": "#161309",
+                    "primary": "#fff4dc",
+                    "primary-container": "#ffd52d",
+                    "on-surface-variant": "#d0c6ac",
+                    "on-tertiary-container": "#006970",
+                    "secondary-container": "#caa500",
+                    "surface-card": "#555555",
+                    "inverse-primary": "#715c00",
+                    "secondary-fixed-dim": "#ebc32d",
+                    "on-primary-fixed-variant": "#564500",
+                    "on-secondary": "#3c2f00",
+                    "divider": "#757575",
+                    "surface-tint": "#ebc313",
+                    "status-occupied": "#FF6B57",
+                    "error": "#ffb4ab",
+                    "on-error-container": "#ffdad6",
+                    "text-secondary": "#D1D1D1",
+                    "surface-dim": "#161309",
+                    "on-error": "#690005",
+                    "border-low": "#6A6A6A",
+                    "on-primary": "#3b2f00",
+                    "on-primary-container": "#715c00",
+                    "primary-fixed": "#ffe17b",
+                    "on-secondary-fixed-variant": "#564500",
+                    "tertiary-fixed-dim": "#00dbea",
+                    "tertiary": "#d9fbff",
+                    "surface-bright": "#3d392d",
+                    "primary-fixed-dim": "#ebc313",
+                    "on-surface": "#eae2d1",
+                    "status-warning": "#FFB800",
+                    "on-tertiary": "#00363b",
+                    "on-primary-fixed": "#231b00",
+                    "text-muted": "#A3A3A3",
+                    "surface": "#161309",
+                    "surface-container-lowest": "#110e05",
+                    "surface-container-high": "#2e2a1f",
+                    "surface-container": "#231f15",
+                    "surface-container-low": "#1f1b11",
+                    "surface-secondary": "#4D4D4D",
+                    "surface-elevated": "#606060",
+                    "error-container": "#93000a",
+                    "on-secondary-container": "#4b3c00",
+                    "secondary": "#ebc32d",
+                    "text-primary": "#FFFFFF",
+                    "on-tertiary-fixed-variant": "#004f55",
+                    "surface-primary": "#434343",
+                    "tertiary-fixed": "#81f4ff",
+                    "on-background": "#eae2d1",
+                    "surface-container-highest": "#393429",
+                    "on-secondary-fixed": "#231b00",
+                    "inverse-surface": "#eae2d1",
+                    "on-tertiary-fixed": "#002022",
+                    "surface-variant": "#393429",
+                    "outline-variant": "#4d4633"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "gutter": "16px",
+                    "touch-target": "48px",
+                    "unit": "4px",
+                    "margin-desktop": "32px"
+            },
+            "fontFamily": {
+                    "stat-display": ["JetBrains Mono"],
+                    "section-heading": ["Inter"],
+                    "body-reg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-mono": ["JetBrains Mono"],
+                    "headline-lg-mobile": ["Inter"],
+                    "card-title": ["Inter"],
+                    "caption": ["Inter"]
+            },
+            "fontSize": {
+                    "stat-display": ["24px", {"lineHeight": "32px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "section-heading": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-reg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-mono": ["11px", {"lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "card-title": ["16px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #161309;
+            color: #eae2d1;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-body-reg text-body-reg">
+<!-- Top Navigation Anchor -->
+<header class="w-full top-0 sticky bg-background dark:bg-background border-b border-outline-variant flex justify-between items-center px-margin-mobile h-touch-target z-50">
+<div class="flex items-center gap-4">
+<button aria-label="Go back" class="active:scale-95 transition-transform p-2 hover:bg-surface-variant rounded-lg">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">VALET PRO</h1>
+</div>
+<button class="active:scale-95 transition-transform p-2 hover:bg-surface-variant rounded-lg">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow container mx-auto px-margin-mobile py-8 pb-24 max-w-lg">
+<!-- Header Visual Element -->
+<div class="mb-10 relative h-40 overflow-hidden rounded-xl border border-outline-variant">
+<img class="w-full h-full object-cover grayscale contrast-125 opacity-60" data-alt="A moody, high-contrast close-up of a sleek black sports car parked in a modern industrial concrete garage. Sharp yellow lighting reflects off the metallic surface, creating an atmosphere of premium automotive performance. The composition is minimalist and professional, emphasizing the industrial dark grey aesthetic and safety yellow accents typical of a high-end valet service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9WKSZxqoAUTLj8zCUzll6f00uNRLhI2E7M2MOKoMVsc4HYPiiEZ0wlZ5m0FRr5gb40cDZhF5hb-cU2uX_s9VlFCrRZVwRyf_0ujRfW07oyCcYdK-onzB39xVxQOBx2RPUVd1jjWvgVYKb9Z3zIcTSQshI7ed1AIzbcD6zWmCeEqtf5rX_MK2Bs6vW3c4vHGJn_cEiad68Lk692mmlJSBYbg7cm5p9syxOukUiTxZpTTA8lX_0aU0yTfxL1A-uRwjxKoXA1yuRmyzZ">
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-4">
+<p class="font-label-mono text-label-mono text-primary-container uppercase tracking-widest mb-1">Account Dashboard</p>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Manage Settings</h2>
+</div>
+</div>
+<!-- Settings Buttons Cluster -->
+<div class="space-y-4">
+<!-- Vehicle Data Button -->
+<button class="w-full group relative overflow-hidden bg-surface-primary hover:bg-surface-elevated active:scale-[0.98] transition-all duration-200 border-2 border-outline-variant hover:border-primary-container flex items-center justify-between p-6 text-left shadow-lg h-32 rounded">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-background rounded-lg border border-outline-variant group-hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary-container">directions_car</span>
+</div>
+<div>
+<span class="block font-headline-lg-mobile text-headline-lg-mobile text-primary">Vehicle Data</span>
+<span class="font-caption text-caption text-on-surface-variant block mt-1">Manage license plates &amp; models</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container transition-colors">chevron_right</span>
+</button>
+<!-- Driver Data Button -->
+<button class="w-full group relative overflow-hidden bg-surface-primary hover:bg-surface-elevated active:scale-[0.98] transition-all duration-200 border-2 border-outline-variant hover:border-primary-container flex items-center justify-between p-6 text-left shadow-lg h-32 rounded">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-background rounded-lg border border-outline-variant group-hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary-container">badge</span>
+</div>
+<div>
+<span class="block font-headline-lg-mobile text-headline-lg-mobile text-primary">Driver data</span>
+<span class="font-caption text-caption text-on-surface-variant block mt-1">Update profile and permissions</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container transition-colors">chevron_right</span>
+</button>
+<!-- Payment Settings Button -->
+<button class="w-full group relative overflow-hidden bg-surface-primary hover:bg-surface-elevated active:scale-[0.98] transition-all duration-200 border-2 border-outline-variant hover:border-primary-container flex items-center justify-between p-6 text-left shadow-lg h-32 rounded">
+<div class="flex items-center gap-4">
+<div class="p-3 bg-background rounded-lg border border-outline-variant group-hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-primary-container">payments</span>
+</div>
+<div>
+<span class="block font-headline-lg-mobile text-headline-lg-mobile text-primary">Payment settings</span>
+<span class="font-caption text-caption text-on-surface-variant block mt-1">Methods and billing</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary-container transition-colors">chevron_right</span>
+</button>
+<button class="w-full group relative overflow-hidden bg-surface-primary hover:bg-surface-elevated active:scale-[0.98] transition-all duration-200 border-2 border-outline-variant hover:border-primary-container flex items-center justify-between p-6 text-left shadow-lg h-32 rounded"><div class="flex items-center gap-4"><div class="p-3 bg-background rounded-lg border border-outline-variant group-hover:border-primary-container transition-colors"><span class="material-symbols-outlined text-primary-container">event_note</span></div><div><span class="block font-headline-lg-mobile text-headline-lg-mobile text-primary">Plan settings</span><span class="font-caption text-caption text-on-surface-variant block mt-1">Manage your subscription</span></div></div><span class="material-symbols-outlined text-outline group-hover:text-primary-container transition-colors">chevron_right</span></button></div>
+<!-- Status Card (Bento style integration) -->
+
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface-container dark:bg-surface-container border-t border-outline-variant flex justify-around items-center px-2 py-2" style="background-color: rgb(31, 27, 17);">
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-caption text-caption">Home</span>
+</a>
+
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-caption text-caption">Bookings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-caption text-caption">Payments</span>
+</a>
+<a class="flex flex-col items-center justify-center p-2 active:scale-90 transition-transform duration-200" href="#" style="color: #ffd52d;">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-caption text-caption">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for button presses
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Future expansion: handle transitions or feedback
+                console.log('Action selected:', btn.innerText.trim().split('\n')[0]);
+            });
+        });
+    </script>
+
+
+
+
+
+
+
+
+</body></html>

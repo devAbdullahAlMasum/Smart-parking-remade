@@ -8,13 +8,19 @@ export const Route = createFileRoute("/lockdown")({
 	component: LockdownScreen,
 })
 
+type ToastType = "info" | "success" | "error"
+
 function LockdownScreen() {
 	const navigate = useNavigate()
 	const [apiUrl, setApiUrl] = useState("")
 	const [unlocking, setUnlocking] = useState(false)
-	const [toast, setToast] = useState({ message: "", type: "info" as const, visible: false })
+	const [toast, setToast] = useState<{ message: string; type: ToastType; visible: boolean }>({
+		message: "",
+		type: "info",
+		visible: false,
+	})
 
-	function showToast(message: string, type: "info" | "success" | "error" = "info") {
+	function showToast(message: string, type: ToastType = "info") {
 		setToast({ message, type, visible: true })
 		setTimeout(() => setToast((t) => ({ ...t, visible: false })), 3500)
 	}

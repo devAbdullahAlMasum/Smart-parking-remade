@@ -22,6 +22,7 @@ async function initDatabase(client) {
     client,
     `CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      auth_user_id TEXT UNIQUE,
       is_demo INTEGER NOT NULL DEFAULT 0,
       name TEXT NOT NULL,
       phone TEXT NOT NULL,
@@ -31,6 +32,8 @@ async function initDatabase(client) {
       updated_at TEXT NOT NULL
     )`,
   );
+  await addColumnIfMissing(client, "ALTER TABLE users ADD COLUMN auth_user_id TEXT");
+  await run(client, "CREATE UNIQUE INDEX IF NOT EXISTS users_auth_user_id_idx ON users(auth_user_id)");
   await addColumnIfMissing(client, "ALTER TABLE users ADD COLUMN is_demo INTEGER NOT NULL DEFAULT 0");
 
   await run(
@@ -40,6 +43,16 @@ async function initDatabase(client) {
       slot_code TEXT NOT NULL UNIQUE,
       sensor_index INTEGER NOT NULL UNIQUE,
       is_occupied INTEGER NOT NULL DEFAULT 0,
+      updated_at TEXT NOT NULL
+    )`,
+  );
+
+  await run(
+    client,
+    `CREATE TABLE IF NOT EXISTS parkings (
+      id INTEGER PRIMARY KEY,
+      name TEXT NOT NULL,
+      code TEXT NOT NULL UNIQUE,
       updated_at TEXT NOT NULL
     )`,
   );
@@ -102,6 +115,7 @@ async function initDatabase(client) {
     `CREATE TABLE IF NOT EXISTS hardware_commands (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       command_type TEXT NOT NULL,
+      command_payload TEXT,
       status TEXT NOT NULL,
       source TEXT NOT NULL,
       worker_id TEXT,
@@ -111,6 +125,7 @@ async function initDatabase(client) {
       finished_at TEXT
     )`,
   );
+  await addColumnIfMissing(client, "ALTER TABLE hardware_commands ADD COLUMN command_payload TEXT");
 
   await run(
     client,
@@ -134,6 +149,12 @@ async function initDatabase(client) {
        VALUES (${index}, 'P${index}', ${index}, 0, '${now}')`,
     );
   }
+
+  await run(
+    client,
+    `INSERT OR IGNORE INTO parkings (id, name, code, updated_at)
+     VALUES (1, 'Parking in dinajpur', '${process.env.PARKING_CODE || "DINJPUR-PARKING-1"}', '${now}')`,
+  );
 
   await run(
     client,

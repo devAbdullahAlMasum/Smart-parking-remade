@@ -1,0 +1,244 @@
+<!DOCTYPE html><html class="dark" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>EmptySpot - User Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#fff4dc",
+                        "divider": "#757575",
+                        "on-secondary-fixed-variant": "#564500",
+                        "surface-tint": "#ebc313",
+                        "status-warning": "#FFB800",
+                        "on-error": "#690005",
+                        "surface-container-low": "#1f1b11",
+                        "text-muted": "#A3A3A3",
+                        "error": "#ffb4ab",
+                        "surface-bright": "#3d392d",
+                        "on-error-container": "#ffdad6",
+                        "on-background": "#eae2d1",
+                        "outline": "#999079",
+                        "tertiary-fixed": "#81f4ff",
+                        "surface-variant": "#393429",
+                        "primary-fixed-dim": "#ebc313",
+                        "primary-fixed": "#ffe17b",
+                        "secondary-fixed": "#ffe081",
+                        "text-primary": "#FFFFFF",
+                        "text-secondary": "#D1D1D1",
+                        "on-tertiary": "#00363b",
+                        "secondary-container": "#caa500",
+                        "inverse-on-surface": "#343025",
+                        "surface": "#161309",
+                        "surface-card": "#555555",
+                        "tertiary-container": "#06efff",
+                        "tertiary-fixed-dim": "#00dbea",
+                        "tertiary": "#d9fbff",
+                        "on-surface": "#eae2d1",
+                        "surface-container-highest": "#393429",
+                        "on-primary-fixed-variant": "#564500",
+                        "on-primary-fixed": "#231b00",
+                        "on-primary": "#3b2f00",
+                        "on-tertiary-container": "#006970",
+                        "border-low": "#6A6A6A",
+                        "inverse-primary": "#715c00",
+                        "surface-elevated": "#606060",
+                        "secondary-fixed-dim": "#ebc32d",
+                        "surface-primary": "#434343",
+                        "secondary": "#ebc32d",
+                        "on-primary-container": "#715c00",
+                        "background": "#161309",
+                        "surface-container": "#231f15",
+                        "primary-container": "#ffd52d",
+                        "surface-container-lowest": "#110e05",
+                        "status-maintenance": "#8A8A8A",
+                        "surface-secondary": "#4D4D4D",
+                        "on-tertiary-fixed": "#002022",
+                        "on-surface-variant": "#d0c6ac",
+                        "on-secondary-fixed": "#231b00",
+                        "surface-container-high": "#2e2a1f",
+                        "on-tertiary-fixed-variant": "#004f55",
+                        "on-secondary-container": "#4b3c00",
+                        "on-secondary": "#3c2f00",
+                        "surface-dim": "#161309",
+                        "inverse-surface": "#eae2d1",
+                        "error-container": "#93000a",
+                        "outline-variant": "#4d4633",
+                        "status-occupied": "#FF6B57"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-desktop": "32px",
+                        "touch-target": "48px",
+                        "margin-mobile": "16px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Inter"],
+                        "section-heading": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "card-title": ["Inter"],
+                        "body-reg": ["Inter"],
+                        "stat-display": ["JetBrains Mono"],
+                        "caption": ["Inter"],
+                        "label-mono": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "section-heading": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "card-title": ["16px", { "lineHeight": "20px", "fontWeight": "600" }],
+                        "body-reg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "stat-display": ["24px", { "lineHeight": "32px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "caption": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "label-mono": ["11px", { "lineHeight": "14px", "letterSpacing": "0.08em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background dark:bg-background text-on-background font-body-reg min-h-screen flex flex-col md:flex-row antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- Desktop SideNav -->
+<nav class="hidden md:flex flex-col w-64 bg-surface-container border-r border-outline-variant min-h-screen sticky top-0 p-margin-desktop gap-gutter z-40">
+<div class="flex items-center gap-2 mb-8">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="empty_dashboard">space_dashboard</span>
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary uppercase tracking-tighter">EMPTYSPOT</h1>
+</div>
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-4 text-on-surface-variant hover:text-primary hover:bg-surface-variant p-2 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="home">home</span>
+<span class="font-card-title text-card-title">Home</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant hover:text-primary hover:bg-surface-variant p-2 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="map">map</span>
+<span class="font-card-title text-card-title">Map</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant hover:text-primary hover:bg-surface-variant p-2 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="event_available">event_available</span>
+<span class="font-card-title text-card-title">Bookings</span>
+</a>
+<a class="flex items-center gap-4 text-on-surface-variant hover:text-primary hover:bg-surface-variant p-2 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors" data-icon="notifications">notifications</span>
+<span class="font-card-title text-card-title">Notifications</span>
+</a>
+<a class="flex items-center gap-4 bg-secondary-container text-on-secondary-container p-2 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-card-title text-card-title">Profile</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col p-margin-mobile md:p-margin-desktop pb-[100px] md:pb-margin-desktop overflow-y-auto">
+<!-- Branding Header (Mobile Only, since TopAppBar is removed) -->
+<!-- Profile Header -->
+<section class="flex flex-col md:flex-row items-center md:items-start gap-gutter mb-margin-desktop mb-0"><div class="w-32 h-32 bg-primary-container rounded-full flex items-center justify-center text-on-primary-container shrink-0 border-2 border-surface mb-4 md:mb-0">
+<span class="font-headline-lg text-3xl md:text-4xl font-bold">JD</span>
+</div>
+<div class="text-center md:text-left flex flex-col justify-center h-full md:ml-6">
+<h2 class="font-headline-lg text-3xl md:text-4xl text-primary mb-2">John Doe</h2>
+<p class="font-body-reg text-lg text-text-muted">john.doe@example.com</p>
+<div class="mt-4 inline-flex items-center gap-2 bg-surface px-4 py-2 rounded-full border border-border-low w-fit mx-auto md:mx-0">
+<span class="material-symbols-outlined text-primary-container text-base" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-mono text-sm text-on-surface">PRO MEMBER</span>
+</div>
+</div></section>
+<!-- Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter mb-margin-desktop">
+<!-- Account Details -->
+<section class="bg-surface border border-border-low p-6 flex flex-col gap-6 rounded">
+<div class="flex items-center gap-3 border-b border-outline-variant pb-3">
+<span class="material-symbols-outlined text-primary-container text-2xl">badge</span>
+<h3 class="font-section-heading text-xl text-primary">Account Details</h3>
+</div>
+<div class="grid grid-cols-1 gap-6">
+<div class="flex flex-col gap-2">
+<span class="font-caption text-sm text-text-muted uppercase tracking-wider">Phone Number</span>
+<span class="font-body-reg text-xl text-on-surface">+1 (555) 019-2834</span>
+</div>
+<div class="flex flex-col gap-2">
+<span class="font-caption text-sm text-text-muted uppercase tracking-wider">License Plate</span>
+<div class="bg-surface-elevated px-4 py-2 rounded border border-border-low inline-block w-fit">
+<span class="font-stat-display text-2xl text-primary leading-none">XYZ-9876</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Vehicle Information -->
+<section class="bg-surface border border-border-low p-6 flex flex-col gap-6 rounded">
+<div class="flex items-center gap-3 border-b border-outline-variant pb-3">
+<span class="material-symbols-outlined text-primary-container text-2xl">directions_car</span>
+<h3 class="font-section-heading text-xl text-primary">Vehicle Information</h3>
+</div>
+<div class="grid grid-cols-1 gap-6">
+<div class="flex flex-col gap-2">
+<span class="font-caption text-sm text-text-muted uppercase tracking-wider">Model</span>
+<span class="font-body-reg text-xl text-on-surface">BMW i8</span>
+</div>
+<div class="flex flex-col gap-2">
+<span class="font-caption text-sm text-text-muted uppercase tracking-wider">Color</span>
+<div class="flex items-center gap-3">
+<div class="w-6 h-6 rounded-full bg-[#222222] border border-outline"></div>
+<span class="font-body-reg text-xl text-on-surface">Sophisto Grey</span>
+</div>
+</div>
+</div>
+</section>
+</div><button class="fixed bottom-24 right-6 w-12 h-12 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center shadow-lg z-40 active:scale-90 transition-transform"><span class="material-symbols-outlined">settings</span></button></main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden bg-surface-container-low fixed bottom-0 w-full z-50 border-t border-outline-variant flex justify-around items-center px-2 py-2 pb-safe">
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-caption text-caption">Home</span>
+</a>
+
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="event_available">event_available</span>
+<span class="font-caption text-caption">Bookings</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-colors active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="notifications">notifications</span>
+<span class="font-caption text-caption">Inbox</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary-container p-2 hover:text-primary transition-colors active:scale-90 duration-200" href="#"><span class="material-symbols-outlined mb-1" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span><span class="font-caption text-caption">Profile</span></a>
+</nav>
+
+
+
+
+
+
+</body></html>

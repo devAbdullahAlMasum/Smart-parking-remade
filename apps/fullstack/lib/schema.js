@@ -2,6 +2,7 @@ import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
+  authUserId: text("auth_user_id").unique(),
   isDemo: integer("is_demo", { mode: "boolean" }).notNull().default(false),
   name: text("name").notNull(),
   phone: text("phone").notNull(),
@@ -16,6 +17,13 @@ export const parkingSlots = sqliteTable("parking_slots", {
   slotCode: text("slot_code").notNull().unique(),
   sensorIndex: integer("sensor_index").notNull().unique(),
   isOccupied: integer("is_occupied", { mode: "boolean" }).notNull().default(false),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const parkings = sqliteTable("parkings", {
+  id: integer("id").primaryKey(),
+  name: text("name").notNull(),
+  code: text("code").notNull().unique(),
   updatedAt: text("updated_at").notNull(),
 });
 
@@ -60,6 +68,7 @@ export const securityLockdown = sqliteTable("security_lockdown", {
 export const hardwareCommands = sqliteTable("hardware_commands", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   commandType: text("command_type").notNull(),
+  commandPayload: text("command_payload"),
   status: text("status").notNull(),
   source: text("source").notNull(),
   workerId: text("worker_id"),

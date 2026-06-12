@@ -12,12 +12,24 @@ Servo gate;
 #define ir_car4 8
 #define ir_car5 9
 
+#define red_led1 10
+#define red_led2 11
+#define red_led3 12
+
 const unsigned long gateDelay = 5000;
+const unsigned long lockdownBlinkDelay = 300;
 const int gateClosedAngle = 10;
 const int gateOpenOffset = 90;
+const int slotLedPins[5] = { A0, A1, A2, A3, A4 };
+const int slotIrPins[5] = { ir_car1, ir_car2, ir_car3, ir_car4, ir_car5 };
+const int redLedPins[3] = { red_led1, red_led2, red_led3 };
 
 bool gateOpen = false;
+bool lockdownActive = false;
+bool lockdownLightsOn = false;
 unsigned long gateTimer = 0;
+unsigned long lockdownBlinkTimer = 0;
+int assignedSlot = -1;
 
 int lastEntryState = -1;
 int lastExitState = -1;
@@ -35,10 +47,28 @@ void setup() {
   pinMode(ir_car4, INPUT);
   pinMode(ir_car5, INPUT);
 
+  for (int i = 0; i < 5; i++) {
+    pinMode(slotLedPins[i], OUTPUT);
+    digitalWrite(slotLedPins[i], LOW);
+  }
+
+  for (int i = 0; i < 3; i++) {
+    pinMode(redLedPins[i], OUTPUT);
+    digitalWrite(redLedPins[i], LOW);
+  }
+
   gate.attach(servo_pin);
   initializeGateClosed();
 
   Serial.println("READY");
+}
+
+void checkAutoClearSlot() {
+  if (assignedSlot != -1) {
+    if (digitalRead(slotIrPins[assignedSlot]) == LOW) {
+      clearAssignedSlot();
+    }
+  }
 }
 
 void loop() {
@@ -46,6 +76,8 @@ void loop() {
   handleEntrySensor();
   handleExitSensor();
   publishSlotsIfChanged();
+  handleLockdownLights();
+  checkAutoClearSlot();
   autoCloseGate();
   delay(30);
 }
@@ -60,6 +92,27 @@ void handleSerialCommand() {
 
   if (command == "CMD:OPEN_GATE") {
     openGate();
+    return;
+  }
+
+  if (command.startsWith("CMD:ASSIGN_SLOT:")) {
+    int slotNumber = command.substring(16).toInt();
+    assignSlot(slotNumber);
+    return;
+  }
+
+  if (command == "CMD:CLEAR_ASSIGNED_SLOT") {
+    clearAssignedSlot();
+    return;
+  }
+
+  if (command == "CMD:LOCKDOWN_ON") {
+    setLockdown(true);
+    return;
+  }
+
+  if (command == "CMD:LOCKDOWN_OFF") {
+    setLockdown(false);
   }
 }
 
@@ -116,6 +169,12 @@ void readSlots(int slots[5]) {
 }
 
 void openGate() {
+  if (lockdownActive) {
+    closeGate();
+    Serial.println("GATE_BLOCKED:LOCKDOWN");
+    return;
+  }
+
   gate.write(getOpenAngle());
   gateOpen = true;
   gateTimer = millis();
@@ -124,6 +183,69 @@ void openGate() {
 void closeGate() {
   gate.write(gateClosedAngle);
   gateOpen = false;
+}
+
+void assignSlot(int slotNumber) {
+  if (slotNumber < 1 || slotNumber > 5) {
+    Serial.println("ASSIGNED_SLOT:INVALID");
+    return;
+  }
+
+  assignedSlot = slotNumber - 1;
+  updateSlotLeds();
+
+  Serial.print("ASSIGNED_SLOT:");
+  Serial.println(slotNumber);
+}
+
+void clearAssignedSlot() {
+  assignedSlot = -1;
+  updateSlotLeds();
+  Serial.println("ASSIGNED_SLOT:CLEARED");
+}
+
+void updateSlotLeds() {
+  for (int i = 0; i < 5; i++) {
+    digitalWrite(slotLedPins[i], i == assignedSlot ? HIGH : LOW);
+  }
+}
+
+void setLockdown(bool active) {
+  lockdownActive = active;
+
+  if (lockdownActive) {
+    closeGate();
+    lockdownBlinkTimer = millis();
+    lockdownLightsOn = true;
+    setRedLeds(true);
+    Serial.println("LOCKDOWN:1");
+    return;
+  }
+
+  lockdownLightsOn = false;
+  setRedLeds(false);
+  Serial.println("LOCKDOWN:0");
+}
+
+void handleLockdownLights() {
+  if (!lockdownActive) {
+    return;
+  }
+
+  unsigned long now = millis();
+  if (now - lockdownBlinkTimer < lockdownBlinkDelay) {
+    return;
+  }
+
+  lockdownBlinkTimer = now;
+  lockdownLightsOn = !lockdownLightsOn;
+  setRedLeds(lockdownLightsOn);
+}
+
+void setRedLeds(bool on) {
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(redLedPins[i], on ? HIGH : LOW);
+  }
 }
 
 void initializeGateClosed() {

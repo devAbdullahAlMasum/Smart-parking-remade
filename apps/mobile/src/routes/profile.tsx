@@ -1,17 +1,21 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { requestJson } from "#/lib/api"
+import { createWebAuthClient } from "#/lib/auth"
 import { storage } from "#/lib/storage"
 import type { User } from "#/lib/types"
-import { PageShell, Heading, Field, PrimaryButton, Toast } from "#/components/ui"
+import { PageShell, Heading, Field, PrimaryButton, SecondaryButton, Toast } from "#/components/ui"
 
 export const Route = createFileRoute("/profile")({
 	component: ProfileScreen,
 })
 
+type ToastType = "info" | "success" | "error"
+
 function ProfileScreen() {
 	const navigate = useNavigate()
 	const [apiUrl, setApiUrl] = useState("")
+	const [authEmail, setAuthEmail] = useState("")
 	const [form, setForm] = useState({
 		name: "",
 		phone: "",
@@ -19,20 +23,48 @@ function ProfileScreen() {
 		vehicleNumber: "",
 	})
 	const [saving, setSaving] = useState(false)
+	const [signingOut, setSigningOut] = useState(false)
 	const [error, setError] = useState("")
-	const [toast, setToast] = useState({ message: "", type: "success" as const, visible: false })
+	const [toast, setToast] = useState<{ message: string; type: ToastType; visible: boolean }>({
+		message: "",
+		type: "success",
+		visible: false,
+	})
+	const authClient = useMemo(
+		() => (apiUrl ? createWebAuthClient(apiUrl) : null),
+		[apiUrl],
+	)
 
 	useEffect(() => {
-		storage.getApiUrl().then((url) => {
+		storage.getApiUrl().then(async (url) => {
 			if (!url) { navigate({ to: "/setup" }); return }
 			setApiUrl(url)
-		})
-		storage.getUser<User>().then((user) => {
-			if (user) navigate({ to: "/dashboard" })
+
+			const client = createWebAuthClient(url)
+			const session = await client.getSession()
+			if (session.error || !session.data?.user) {
+				navigate({ to: "/auth" })
+				return
+			}
+
+			const authUser = session.data.user
+			setAuthEmail(authUser.email)
+			const data = await requestJson<{ authUser: unknown; driver: User | null }>(`${url}/api/me`)
+			if (data.driver) {
+				setForm({
+					name: data.driver.name,
+					phone: data.driver.phone,
+					licenseNumber: data.driver.licenseNumber,
+					vehicleNumber: data.driver.vehicleNumber,
+				})
+				await storage.setUser(data.driver)
+			} else {
+				setForm((prev) => ({ ...prev, name: authUser.name || "" }))
+			}
 		})
 	}, [navigate])
 
-	function showToast(message: string, type: "info" | "success" | "error" = "success") {
+	function showToast(message: string, type: ToastType = "success") {
 		setToast({ message, type, visible: true })
 		setTimeout(() => setToast((t) => ({ ...t, visible: false })), 3000)
 	}
@@ -58,8 +90,8 @@ function ProfileScreen() {
 
 		setSaving(true)
 		try {
-			const user = await requestJson<User>(`${apiUrl}/api/users`, {
-				method: "POST",
+			const user = await requestJson<User>(`${apiUrl}/api/me`, {
+				method: "PUT",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(payload),
 			})
@@ -74,15 +106,28 @@ function ProfileScreen() {
 		}
 	}
 
+	async function signOut() {
+		if (!authClient) return
+		setSigningOut(true)
+		try {
+			await authClient.signOut()
+			await storage.removeUser()
+			await storage.removeBooking()
+			navigate({ to: "/auth" })
+		} finally {
+			setSigningOut(false)
+		}
+	}
+
 	return (
 		<PageShell>
 			<Toast {...toast} />
 
 			<div className="space-y-8 pt-8">
 				<div className="space-y-3">
-					<Heading size="xl">Register your vehicle</Heading>
+					<Heading size="xl">Account</Heading>
 					<p className="text-[15px] text-base-content/50 leading-relaxed">
-						Add your details to enable parking access and receive alerts.
+						{authEmail ? `Signed in as ${authEmail}. ` : ""}Keep your real driver and vehicle details up to date.
 					</p>
 				</div>
 
@@ -129,8 +174,12 @@ function ProfileScreen() {
 					)}
 
 					<PrimaryButton onClick={save} disabled={saving}>
-						{saving ? "Registering…" : "Register vehicle"}
+						{saving ? "Saving…" : "Save account"}
 					</PrimaryButton>
+
+					<SecondaryButton danger onClick={signOut} disabled={signingOut}>
+						{signingOut ? "Signing out…" : "Log out"}
+					</SecondaryButton>
 				</div>
 			</div>
 		</PageShell>

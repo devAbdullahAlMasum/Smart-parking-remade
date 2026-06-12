@@ -32,3 +32,15 @@ export async function publishRefresh(source) {
     publishedAt: new Date().toISOString(),
   });
 }
+
+export async function publishVehicleMovementAlert(payload) {
+  if (!process.env.ABLY_API_KEY) {
+    return;
+  }
+
+  const ably = getAbly();
+  await ably.channels.get(REALTIME_CHANNEL).publish("vehicle_movement", {
+    ...payload,
+    publishedAt: new Date().toISOString(),
+  });
+}
