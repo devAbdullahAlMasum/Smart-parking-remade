@@ -52,7 +52,8 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build web app
-        run: pnpm build
+        working-directory: .
+        run: pnpm --filter @smart-parking/mobile build
 
       - name: Install Capacitor Android platform
         run: pnpm add @capacitor/android
