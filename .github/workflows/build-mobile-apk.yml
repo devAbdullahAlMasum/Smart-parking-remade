@@ -1,0 +1,75 @@
+name: Build Mobile APK (Capacitor)
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Get pnpm store directory
+        id: pnpm-store
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-store-
+
+      - name: Set up Java (Android Compiler)
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "17"
+
+      - name: Install dependencies
+        working-directory: .
+        run: pnpm install --frozen-lockfile
+
+      - name: Build web app
+        run: pnpm exec vite build
+
+      - name: Install Capacitor Android platform
+        run: pnpm add @capacitor/android
+
+      - name: Add Android platform & sync
+        run: |
+          npx cap add android --no-format
+          npx cap sync android
+
+      - name: Build debug APK
+        run: cd android && ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: smart-parking-apk
+          path: apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
