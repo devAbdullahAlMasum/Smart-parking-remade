@@ -47,7 +47,7 @@ jobs:
 
       - name: Add Android platform & sync
         run: |
-          npx cap add android --no-format
+          npx cap add android
           npx cap sync android
 
       - name: Build debug APK
