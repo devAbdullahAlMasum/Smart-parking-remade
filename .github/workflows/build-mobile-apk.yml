@@ -53,7 +53,7 @@ jobs:
 
       - name: Build web app
         working-directory: .
-        run: pnpm --filter @smart-parking/mobile build
+        run: npx --yes vite build --config apps/mobile/vite.config.ts
 
       - name: Install Capacitor Android platform
         run: pnpm add @capacitor/android
