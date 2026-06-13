@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useEffect, useMemo, useState } from "react"
 import { requestJson } from "#/lib/api"
-import { createWebAuthClient } from "#/lib/auth"
+import { createWebAuthClient, getAuthSession } from "#/lib/auth"
 import { storage } from "#/lib/storage"
 import type { User } from "#/lib/types"
 import { PageShell, Heading, Field, PrimaryButton, SecondaryButton, Toast } from "#/components/ui"
@@ -40,8 +40,7 @@ function ProfileScreen() {
 			if (!url) { navigate({ to: "/setup" }); return }
 			setApiUrl(url)
 
-			const client = createWebAuthClient(url)
-			const session = await client.getSession()
+			const session = await getAuthSession(url)
 			if (session.error || !session.data?.user) {
 				navigate({ to: "/auth" })
 				return

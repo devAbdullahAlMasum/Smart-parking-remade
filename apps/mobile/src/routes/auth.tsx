@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useEffect, useMemo, useState } from "react"
 import { storage } from "#/lib/storage"
-import { createWebAuthClient } from "#/lib/auth"
+import { createWebAuthClient, getAuthSession } from "#/lib/auth"
 import { PageShell, Heading, Field, PrimaryButton, GhostLink } from "#/components/ui"
 
 export const Route = createFileRoute("/auth")({
@@ -78,6 +78,14 @@ function AuthScreen() {
 			if (result.error) {
 				reportAuthLog("Better Auth returned an error", { authError: result.error })
 				throw new Error(result.error.message ?? "Authentication failed.")
+			}
+
+			const session = await getAuthSession(apiUrl)
+			if (session.error || !session.data?.user) {
+				reportAuthLog("Better Auth login succeeded but no session was found", {
+					sessionError: session.error,
+				})
+				throw new Error("Signed in, but the session was not saved. Reopen the app through the service address and try again.")
 			}
 
 			navigate({ to: "/profile" })

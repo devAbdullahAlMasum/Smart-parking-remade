@@ -38,7 +38,7 @@ import {
 	Toast,
 } from "#/components/ui";
 import { requestJson } from "#/lib/api";
-import { createWebAuthClient } from "#/lib/auth";
+import { getAuthSession } from "#/lib/auth";
 import { createRealtimeClient } from "#/lib/realtime";
 import { storage } from "#/lib/storage";
 import type { Parking, StatusData, User } from "#/lib/types";
@@ -133,8 +133,7 @@ function DashboardScreen() {
 			}
 
 			setApiUrl(url);
-			const authClient = createWebAuthClient(url);
-			const session = await authClient.getSession();
+			const session = await getAuthSession(url);
 			if (session.error || !session.data?.user) {
 				navigate({ to: "/auth" });
 				return;

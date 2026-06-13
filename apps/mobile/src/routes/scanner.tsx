@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { requestJson } from "#/lib/api"
-import { createWebAuthClient } from "#/lib/auth"
+import { createWebAuthClient, getAuthSession } from "#/lib/auth"
 import { storage } from "#/lib/storage"
 import { Toast, Field, PrimaryButton } from "#/components/ui"
 import { ScanLine } from "lucide-react"
@@ -54,8 +54,8 @@ function ScannerScreen() {
 				return
 			}
 
-			const client = authClient ?? createWebAuthClient(url)
-			const session = await client.getSession()
+			if (!authClient) createWebAuthClient(url)
+			const session = await getAuthSession(url)
 			if (session.error || !session.data?.user) {
 				navigate({ to: "/auth" })
 				return
