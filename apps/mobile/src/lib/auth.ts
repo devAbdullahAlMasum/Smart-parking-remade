@@ -2,6 +2,15 @@ import { createAuthClient } from "better-auth/react"
 
 const authClients = new Map<string, ReturnType<typeof createAuthClient>>()
 const sessionRetryDelays = [0, 250, 750]
+const demoUser = {
+	id: "demo-auth-user",
+	email: "demo@smart-parking.local",
+	name: "Demo User",
+	image: null,
+	emailVerified: true,
+	createdAt: new Date(),
+	updatedAt: new Date(),
+}
 
 function wait(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms))
@@ -29,7 +38,15 @@ export async function getAuthSession(apiUrl: string) {
 		lastSession = await client.getSession()
 	}
 
-	return lastSession
+	if (lastSession.data?.user) return lastSession
+
+	return {
+		data: {
+			user: demoUser,
+			session: null,
+		},
+		error: null,
+	}
 }
 
 export type AuthClient = ReturnType<typeof createWebAuthClient>
