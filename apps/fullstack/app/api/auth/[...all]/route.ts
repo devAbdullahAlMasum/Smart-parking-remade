@@ -4,11 +4,24 @@ import { NextRequest, NextResponse } from "next/server";
 
 const authHandler = toNextJsHandler(auth);
 
-function patchCors(response: Response) {
+function getCorsHeaders(request: NextRequest) {
+  const origin = request.headers.get("origin");
+
+  return {
+    "Access-Control-Allow-Origin": origin || "*",
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Allow-Headers":
+      request.headers.get("access-control-request-headers") || "Content-Type, Authorization, X-Requested-With, x-device-key",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+    Vary: "Origin",
+  };
+}
+
+function patchCors(request: NextRequest, response: Response) {
   const headers = new Headers(response.headers);
-  headers.set("Access-Control-Allow-Origin", "*");
-  headers.set("Access-Control-Allow-Headers", "*");
-  headers.set("Access-Control-Allow-Methods", "*");
+  for (const [key, value] of Object.entries(getCorsHeaders(request))) {
+    headers.set(key, value);
+  }
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -16,19 +29,15 @@ function patchCors(response: Response) {
   });
 }
 
-export function OPTIONS() {
-  const headers = new Headers({
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "*",
-    "Access-Control-Allow-Methods": "*",
-  });
+export function OPTIONS(request: NextRequest) {
+  const headers = new Headers(getCorsHeaders(request));
   return new NextResponse(null, { status: 204, headers });
 }
 
 export async function GET(request: NextRequest) {
-  return patchCors(await authHandler.GET(request));
+  return patchCors(request, await authHandler.GET(request));
 }
 
 export async function POST(request: NextRequest) {
-  return patchCors(await authHandler.POST(request));
+  return patchCors(request, await authHandler.POST(request));
 }

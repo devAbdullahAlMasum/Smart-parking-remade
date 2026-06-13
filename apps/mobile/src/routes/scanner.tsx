@@ -164,7 +164,7 @@ function ScannerScreen() {
 			stopWebCamera()
 			const message = err instanceof Error ? err.message : "Camera permission denied."
 			setCameraError(
-				`${message} If you opened this over http://192.168.x.x, Chrome may block camera access unless the page is HTTPS.`,
+				`${message} If you opened this over HTTP in a browser, Chrome may block camera access unless the page is HTTPS.`,
 			)
 			setWebFallback(true)
 		}

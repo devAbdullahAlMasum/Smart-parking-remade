@@ -33,9 +33,15 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 function patchCors(response, _request) {
-  response.headers.set("Access-Control-Allow-Origin", "*");
-  response.headers.set("Access-Control-Allow-Headers", "*");
-  response.headers.set("Access-Control-Allow-Methods", "*");
+  const origin = _request.headers.get("origin");
+  response.headers.set("Access-Control-Allow-Origin", origin || "*");
+  response.headers.set("Access-Control-Allow-Credentials", "true");
+  response.headers.set(
+    "Access-Control-Allow-Headers",
+    _request.headers.get("access-control-request-headers") || "Content-Type, Authorization, X-Requested-With, x-device-key",
+  );
+  response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+  response.headers.set("Vary", "Origin");
   return response;
 }
 
@@ -69,6 +75,7 @@ function logApiResponse(request, path, status, extra = {}) {
 function unauthorized() {
   const response = json({ message: "Unauthorized device" }, 401);
   response.headers.set("Access-Control-Allow-Origin", "*");
+  response.headers.set("Access-Control-Allow-Credentials", "true");
   response.headers.set("Access-Control-Allow-Headers", "Content-Type, x-device-key");
   response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
   response.headers.set("Vary", "Origin");

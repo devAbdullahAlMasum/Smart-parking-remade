@@ -9,17 +9,11 @@
     "check-types": "turbo check-types",
     "dev:fullstack": "turbo -F @smart-parking/fullstack dev",
     "dev:pi": "turbo -F @smart-parking/pi dev",
-    "dev:native": "turbo -F @smart-parking/native dev",
-    "dev:mobile": "turbo -F @smart-parking/mobile dev",
-    "android": "pnpm --filter @smart-parking/native android",
-    "ios": "pnpm --filter @smart-parking/native ios"
+    "dev:mobile": "turbo -F @smart-parking/mobile dev"
   },
   "dependencies": {
     "dotenv": "^17.2.2",
-    "zod": "^4.1.13",
-    "expo": "~54.0.33",
-    "react": "19.1.0",
-    "react-native": "0.81.5"
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "turbo": "^2.8.12",

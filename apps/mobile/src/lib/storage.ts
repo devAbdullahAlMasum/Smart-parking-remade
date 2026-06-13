@@ -9,6 +9,14 @@ const KEYS = {
 export const storage = {
 	async getApiUrl(): Promise<string> {
 		const { value } = await Preferences.get({ key: KEYS.apiUrl })
+		if (
+			value?.endsWith(":8881") &&
+			typeof window !== "undefined" &&
+			window.location.port === "3000"
+		) {
+			await Preferences.set({ key: KEYS.apiUrl, value: window.location.origin })
+			return window.location.origin
+		}
 		return value ?? ""
 	},
 

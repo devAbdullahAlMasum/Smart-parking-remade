@@ -10,7 +10,9 @@ export const Route = createFileRoute("/setup")({
 
 function SetupScreen() {
 	const navigate = useNavigate()
-	const [input, setInput] = useState("")
+	const defaultServiceAddress =
+		typeof window === "undefined" ? "http://100.85.28.79:3000" : window.location.origin
+	const [input, setInput] = useState(defaultServiceAddress)
 	const [error, setError] = useState("")
 
 	async function connect() {
@@ -45,7 +47,7 @@ function SetupScreen() {
 								setInput(e.target.value)
 								setError("")
 							}}
-							placeholder="parking.example.com"
+							placeholder={defaultServiceAddress}
 							autoCapitalize="off"
 							autoCorrect="off"
 							spellCheck={false}

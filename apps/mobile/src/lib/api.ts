@@ -18,6 +18,7 @@ export async function requestJson<T = unknown>(
 			const logUrl = new URL("/api/client-log", url).toString()
 			void fetch(logUrl, {
 				method: "POST",
+				credentials: "include",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(payload),
 			})
@@ -29,14 +30,15 @@ export async function requestJson<T = unknown>(
 	let response: Response
 	try {
 		response = await fetch(url, {
+			credentials: "include",
 			...options,
 		})
 	} catch (error) {
 		const method = options?.method ?? "GET"
 		const message = error instanceof Error ? error.message : String(error)
 		const hint = url.includes("localhost") || url.includes("127.0.0.1")
-			? "This URL points to the phone/browser itself. Use your PC LAN IP, for example http://192.168.1.101:8881."
-			: "Check that the server is running with --hostname 0.0.0.0, Windows Firewall allows the port, and the phone is on the same LAN."
+			? "This URL points to the phone/browser itself. Use the Tailscale address http://100.85.28.79:8881."
+			: "Check that the server is running on 0.0.0.0:8881 and that this device is connected to Tailscale."
 
 		console.error("[api] fetch failed", {
 			url,
