@@ -29,7 +29,6 @@ export async function requestJson<T = unknown>(
 	let response: Response
 	try {
 		response = await fetch(url, {
-			credentials: "include",
 			...options,
 		})
 	} catch (error) {

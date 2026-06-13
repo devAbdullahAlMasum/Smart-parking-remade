@@ -32,18 +32,10 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function patchCors(response, request) {
-  const origin = request?.headers.get("origin") || "*";
-  if (origin !== "*") {
-    response.headers.set("Access-Control-Allow-Origin", origin);
-    response.headers.set("Access-Control-Allow-Credentials", "true");
-  } else {
-    response.headers.set("Access-Control-Allow-Origin", "*");
-    response.headers.delete("Access-Control-Allow-Credentials");
-  }
-  response.headers.set("Access-Control-Allow-Headers", "Content-Type, x-device-key");
-  response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
-  response.headers.set("Vary", "Origin");
+function patchCors(response, _request) {
+  response.headers.set("Access-Control-Allow-Origin", "*");
+  response.headers.set("Access-Control-Allow-Headers", "*");
+  response.headers.set("Access-Control-Allow-Methods", "*");
   return response;
 }
 

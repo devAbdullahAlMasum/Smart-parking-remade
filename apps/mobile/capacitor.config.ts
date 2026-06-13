@@ -5,7 +5,9 @@ const config: CapacitorConfig = {
 	appName: "Smart Parking",
 	webDir: "dist",
 	server: {
-		androidScheme: "https",
+		androidScheme: "http",
+		cleartext: true,
+		allowNavigation: ["*"],
 	},
 }
 
