@@ -52,7 +52,8 @@ jobs:
 
       - name: Bump minSdkVersion to 26 (required by barcode scanner)
         run: |
-          sed -i 's/minSdkVersion[ =]*[0-9]\+/minSdkVersion 26/' android/app/build.gradle android/variables.gradle 2>/dev/null || true
+          sed -i 's/minSdkVersion[ =]\+[0-9]\+/minSdkVersion 26/' android/app/build.gradle 2>/dev/null; true
+          sed -i 's/minSdkVersion = [0-9]\+/minSdkVersion = 26/' android/variables.gradle 2>/dev/null; true
           echo "Updated minSdkVersion in:"
           grep -n "minSdkVersion" android/app/build.gradle android/variables.gradle 2>/dev/null || true
 
